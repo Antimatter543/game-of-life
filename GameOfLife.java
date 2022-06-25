@@ -13,21 +13,22 @@ public class GameOfLife {
 	int[][] board; // 2D array
 	int numRows;
 	int numCols;
+	int step;
 
 	// Constructor method for GameOfLife (constructors have the name of the class)
 	public GameOfLife(int rows, int cols) {
 		board = new int[rows][cols]; // initialises 10x10 matrix of 0's.
 		numRows = rows;
 		numCols = cols;
-
 	}
 
-	// public update() {
-	// 	// Updates the game state to the next tick.
-	// 	// rule1();
-	// 	// rule2();
-	// 	// rule3();
-	// }
+	public boolean outOfBounds(int x, int y) {
+		// Returns true if a given coordinate is out of bounds.
+		if (x < 0 || y < 0 || x >= numRows || y >= numCols) {
+			return true;
+		}
+		return false;
+	}
 
 	public int numAdjacent(int row, int col) {
 		// Returns True if a given position has a live state adjacent (omnidirectional)
@@ -54,14 +55,56 @@ public class GameOfLife {
 		return count;
 	}
 
-	public boolean outOfBounds(int x, int y) {
-		// Returns true if a given coordinate is out of bounds.
-		if (x < 0 || y < 0 || x >= numRows || y >= numCols) {
-			return true;
+	public void update() {
+		// Updates the game state to the next tick.
+
+		for (int i = 0; i < board.length; i++) {
+			for (int j = 0; j < board[i].length; j++) {
+				// Execute rules for each cell (unoptimised right now)
+				int numAdjLives = numAdjacent(i, j);
+				int curCell = board[i][j];
+
+				curCell = rule1(numAdjLives, curCell); // Sets the curCell to either 1/0 depending if it passes rule one
+														// (similar for next 2 rules, unsure if this is best way to do
+														// it.)
+				curCell = rule2(numAdjLives, curCell);
+
+			}
 		}
-		return false;
+
+
+
+		step++; // Just so we can keep track of the step count.
+
+		// Updates the game state to the next tick.
+		// rule1();
+		// rule2();
+		// rule3();
 	}
 
+	private int rule1(int adjLives, int curCell) {
+		// Any live cell with two or three alive neighbours survives.
+		if ((adjLives == 2 || adjLives == 3) && curCell == 1) {
+			return 1;
+		}
+		return 0;
+	}
+
+	private int rule2(int adjLives, int curCell) {
+		// Any dead cell with three live neighbours becomes a live cell.
+		if (adjLives == 3 && curCell == 0) {
+			return 1;
+		}
+		return 0;
+	}
+
+	private int rule3(int adjLives, int curCell) {
+		// All other live cells die in the next generation. Similarly, all other dead cells stay dead.
+		if (adjLives == 3 && curCell == 0) {
+			return 1;
+		}
+		return 0;
+	}
 	public static void main(String[] args) {
 		GameOfLife gLife = new GameOfLife(10, 10);
 
