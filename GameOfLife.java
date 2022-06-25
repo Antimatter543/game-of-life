@@ -1,19 +1,13 @@
 import java.util.Arrays;
 
-/* 
-https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life
-These rules, which compare the behavior of the automaton to real life, can be condensed into the following:
-
-Any live cell with two or three live neighbours survives.
-Any dead cell with three live neighbours becomes a live cell.
-All other live cells die in the next generation. Similarly, all other dead cells stay dead.
-*/
-
 public class GameOfLife {
 	int[][] board; // 2D array
 	int numRows;
 	int numCols;
 	int step;
+
+	public static final int ALIVE = 1;
+	public static final int DEAD = 0;
 
 	// Constructor method for GameOfLife (constructors have the name of the class)
 	public GameOfLife(int rows, int cols) {
@@ -60,61 +54,45 @@ public class GameOfLife {
 
 		for (int i = 0; i < board.length; i++) {
 			for (int j = 0; j < board[i].length; j++) {
-				// Execute rules for each cell (unoptimised right now)
+				// Execute rules for each cell
 				int numAdjLives = numAdjacent(i, j);
 				int curCell = board[i][j];
 
-				curCell = rule1(numAdjLives, curCell); // Sets the curCell to either 1/0 depending if it passes rule one
-														// (similar for next 2 rules, unsure if this is best way to do
-														// it.)
-				curCell = rule2(numAdjLives, curCell);
+				if (curCell == ALIVE) {
+					if (numAdjLives < 2 || numAdjLives > 3) {
+						board[i][j] = DEAD;
+					}
+
+				} else {
+					if (numAdjLives == 3) {
+						board[i][j] = ALIVE;
+					}
+				}
 
 			}
 		}
 
-
-
 		step++; // Just so we can keep track of the step count.
-
-		// Updates the game state to the next tick.
-		// rule1();
-		// rule2();
-		// rule3();
 	}
 
-	private int rule1(int adjLives, int curCell) {
-		// Any live cell with two or three alive neighbours survives.
-		if ((adjLives == 2 || adjLives == 3) && curCell == 1) {
-			return 1;
-		}
-		return 0;
-	}
-
-	private int rule2(int adjLives, int curCell) {
-		// Any dead cell with three live neighbours becomes a live cell.
-		if (adjLives == 3 && curCell == 0) {
-			return 1;
-		}
-		return 0;
-	}
-
-	private int rule3(int adjLives, int curCell) {
-		// All other live cells die in the next generation. Similarly, all other dead cells stay dead.
-		if (adjLives == 3 && curCell == 0) {
-			return 1;
-		}
-		return 0;
-	}
 	public static void main(String[] args) {
 		GameOfLife gLife = new GameOfLife(10, 10);
 
 		gLife.board[4][4] = 1; // to test adjacent
-		gLife.board[3][2] = 1; // to test adjacent
+		gLife.board[3][3] = 1; // to test adjacent
+		gLife.board[3][4] = 1; // to test adjacent
+		gLife.board[4][3] = 1; // to test adjacent
+		// i made a box :)  this should be in a steady state if rules implemented right.
+
 
 		System.out.println(Arrays.deepToString(gLife.board));
 
 		System.out.println(gLife.numAdjacent(3, 3));
 		System.out.println("Hey  this is what I see at 4,4: " + gLife.board[4][4]);
+
+		gLife.update();
+		System.out.println(Arrays.deepToString(gLife.board));
+
 
 	}
 }
